@@ -10,7 +10,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const DATA = [
   {
@@ -127,13 +127,14 @@ export default function Home() {
 
   function navigateToFormGroup() {
     router.navigate('./form-group')
+    openMenu()
   }
 
   return (
     <SafeAreaView className="flex gap-4 flex-1 bg-[#F6F6F6] relative">
       <Dropdown open={isMenuOpen} closeOnPress={openMenu} closeOnTouchMove={() => setIsMenuOpen(false)}>
-        <Pressable onPress={navigateToFormGroup}><Text>Novo grupo</Text></Pressable>
-        <Pressable><Text>Configurações</Text></Pressable>
+        <Pressable onPress={navigateToFormGroup} className="p-4"><Text>Novo grupo</Text></Pressable>
+        <Pressable className="p-4"><Text>Configurações</Text></Pressable>
       </Dropdown>
 
       <View className="w-full h-[70px] flex flex-row items-center justify-between pl-5">

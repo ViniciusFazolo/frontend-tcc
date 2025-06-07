@@ -8,96 +8,101 @@ import fonts from "../constants/fonts";
 
 export default function Login() {
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
+    // const [email, setEmail] = useState('');
+    // const [password, setPassword] = useState('');
+    // const [loading, setLoading] = useState(false);
     const router = useRouter();
-    const { login, loadToken, isAuthenticated } = useAuthStore();
+    // const { login, loadToken, isAuthenticated } = useAuthStore();
 
-    useEffect(() => {
-        loadToken();
-    }, []);
+    // useEffect(() => {
+    //     loadToken();
+    // }, []);
 
-    useEffect(() => {
-        if (isAuthenticated) {
-            router.replace("/(painel)/home");
-        }
-    }, [isAuthenticated]);
+    // useEffect(() => {
+    //     if (isAuthenticated) {
+    //         router.replace("/(painel)/home");
+    //     }
+    // }, [isAuthenticated]);
 
-    async function handleSignIn() {
-        setLoading(true);
-        try {
-            const response = await api.post("/auth/login", {
-                login: email,
-                password: password,
-            });
+    // async function handleSignIn() {
+    //     setLoading(true);
+    //     try {
+    //         const response = await api.post("/auth/login", {
+    //             login: email,
+    //             password: password,
+    //         });
 
-            await login(response.data.token);
-            router.replace("/(painel)/home");
-        } catch (error) {
-            console.error("Erro ao fazer login", error);
-        } finally {
-            setLoading(false);
-        }
-    }
+    //         await login(response.data.token);
+    //         router.replace("/(painel)/home");
+    //     } catch (error) {
+    //         console.error("Erro ao fazer login", error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // }
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <ScrollView style={{ flex: 1, backgroundColor: colors.white }}>
-                <View style={styles.container}>
-                    <View style={styles.header}>
-                        <Text style={styles.logoText}>
-                            Retro <Text style={{ color: colors["brown-white"] }}>Photo</Text>
-                        </Text>
-                        <Text style={styles.slogan}>
-                            Recordando momentos
-                        </Text>
-                    </View>
+        <View className="flex items-center justify-center h-full">
+            <Pressable onPress={() => router.navigate('/(painel)/home')} className="p-10 border">
+            <Text>Ir para home</Text>
+    </Pressable>
+        </View>
+        // <SafeAreaView style={{ flex: 1 }}>
+        //     <ScrollView style={{ flex: 1, backgroundColor: colors.white }}>
+        //         <View style={styles.container}>
+        //             <View style={styles.header}>
+        //                 <Text style={styles.logoText}>
+        //                     Retro <Text style={{ color: colors["brown-white"] }}>Photo</Text>
+        //                 </Text>
+        //                 <Text style={styles.slogan}>
+        //                     Recordando momentos
+        //                 </Text>
+        //             </View>
 
-                    <View style={styles.form}>
-                        <View>
-                            <Text style={styles.label}>Email</Text>
-                            <TextInput
-                                placeholder="Digite seu email"
-                                placeholderTextColor={colors.gray}
-                                style={styles.input}
-                                value={email}
-                                onChangeText={setEmail}
-                            />
-                        </View>
+        //             <View style={styles.form}>
+        //                 <View>
+        //                     <Text style={styles.label}>Email</Text>
+        //                     <TextInput
+        //                         placeholder="Digite seu email"
+        //                         placeholderTextColor={colors.gray}
+        //                         style={styles.input}
+        //                         value={email}
+        //                         onChangeText={setEmail}
+        //                     />
+        //                 </View>
 
-                        <View>
-                            <Text style={styles.label}>Senha</Text>
-                            <TextInput
-                                placeholder="Digite sua senha"
-                                placeholderTextColor={colors.gray}
-                                style={styles.input}
-                                secureTextEntry={true}
-                                value={password}
-                                onChangeText={setPassword}
-                            />
-                        </View>
+        //                 <View>
+        //                     <Text style={styles.label}>Senha</Text>
+        //                     <TextInput
+        //                         placeholder="Digite sua senha"
+        //                         placeholderTextColor={colors.gray}
+        //                         style={styles.input}
+        //                         secureTextEntry={true}
+        //                         value={password}
+        //                         onChangeText={setPassword}
+        //                     />
+        //                 </View>
 
-                        <Pressable style={styles.button} onPress={handleSignIn}>
-                            <Text style={styles.buttonText}>
-                                {loading ? "Carregando..." : "Acessar"}
-                            </Text>
-                        </Pressable>
+        //                 <Pressable style={styles.button} onPress={handleSignIn}>
+        //                     <Text style={styles.buttonText}>
+        //                         {loading ? "Carregando..." : "Acessar"}
+        //                     </Text>
+        //                 </Pressable>
 
-                        <Link href={'./(auth)/signup/signup'} style={styles.link}>
-                            <Text>Ainda não possui uma conta? <Text style={{ color: colors["brown-red"]}}>Cadastre-se</Text></Text>
-                        </Link>
+        //                 <Link href={'./(auth)/signup/signup'} style={styles.link}>
+        //                     <Text>Ainda não possui uma conta? <Text style={{ color: colors["brown-red"]}}>Cadastre-se</Text></Text>
+        //                 </Link>
 
-                        <View style={styles.imageView}>
-                        </View>
+        //                 <View style={styles.imageView}>
+        //                 </View>
 
 
-                    </View>
+        //             </View>
 
-                </View>
-            </ScrollView>
+        //         </View>
+        //     </ScrollView>
 
-        </SafeAreaView>
+        // </SafeAreaView>
 
     )
 }

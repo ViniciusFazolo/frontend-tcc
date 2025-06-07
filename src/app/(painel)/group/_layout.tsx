@@ -1,59 +1,41 @@
 import React from "react";
 import { Tabs } from "expo-router";
-import { AntDesign, Feather } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Layout() {
   return (
     <Tabs
       screenOptions={{
+        tabBarShowLabel: false,
         headerShown: false,
         tabBarStyle: {
-          height: 70,
-        },
-        tabBarLabelStyle: {
-          fontSize: 15,
-        },
-        tabBarIconStyle: {
-          width: "100%",
-          height: "100%",
-        },
+          borderTopWidth: 0,
+          height: 70
+        }
       }}
     >
       <Tabs.Screen
-        name="add-participant/index"
-        options={{
-          title: "",
-          tabBarIcon: () => <AntDesign name="adduser" size={30} className="text-gray-600" />,
-          headerShown: false,
-          tabBarStyle: {
-            display: "none",
-          },
-        }}
-      />
-      <Tabs.Screen
         name="camera/index"
         options={{
-          title: "",
-          tabBarIcon: () => <Feather name="aperture" size={50} className="text-gray-600" />,
-          headerShown: false,
-        }}
-      />
-      <Tabs.Screen
-        name="participants/index"
-        options={{
-          title: "",
-          tabBarIcon: () => <Feather name="users" size={30} className="text-gray-600" />,
-          headerShown: false,
-          tabBarStyle: {
-            display: "none",
-          },
+          tabBarIcon: () => (
+            <Ionicons name="aperture-outline" size={60} color="#A93F2A" />
+          ),
+          tabBarIconStyle: {
+            height: '100%',
+            width: 60
+          }
         }}
       />
 
       <Tabs.Screen
-        name="[id]"
-        options={{ href: null }}
+        name="participants/index"
+        options={{href: null}}
       />
+      <Tabs.Screen
+        name="add-participant/index"
+        options={{href: null}}
+      />
+      <Tabs.Screen name="[id]" options={{ href: null }} />
       <Tabs.Screen
         name="add-album/index"
         options={{ href: null, tabBarStyle: { display: "none" } }}

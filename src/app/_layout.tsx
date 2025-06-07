@@ -1,9 +1,13 @@
 import React from "react";
 import { Stack } from "expo-router";
 import '../../global.css';
+import { StatusBar } from "react-native";
 
 export default function MainLayout(){
     return (
+       <>
+        <StatusBar backgroundColor="white" barStyle="dark-content" />
+
         <Stack>
             <Stack.Screen
                 name="index"
@@ -18,5 +22,6 @@ export default function MainLayout(){
                 options={{ headerShown: false }}
                 />  
         </Stack>
+        </>
     )
 }

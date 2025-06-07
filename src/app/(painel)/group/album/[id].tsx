@@ -1,8 +1,6 @@
 import Stack from "@/src/components/stack";
 import { FontAwesome6 } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import { FlatList, Image, Pressable, Text, View } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 const DATA = [
   {
@@ -28,8 +26,6 @@ const DATA = [
 ];
 
 export default function Album() {
-  const route = useRouter();
-
   function renderItem({ item }: any) {
     return (
       <View className="flex flex-col gap-4 mb-8">
@@ -61,41 +57,35 @@ export default function Album() {
     );
   }
 
-  function handleBackPage() {
-    route.replace("/(painel)/home");
-  }
-
   return (
-    <SafeAreaProvider>
-      <SafeAreaView className="flex flex-1 bg-[#F6F6F6]">
-        <Stack href={"/(painel)/home"}>
-          <View className="flex-1 flex flex-row items-center gap-4 ml-2">
-            <Image
-              className="rounded-full w-10 h-10"
-              source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }}
-            />
-          </View>
-          <View className="flex flex-row gap-3 text-gray-900">
-            <Pressable>
-              <FontAwesome6 name="ellipsis-vertical" size={24} color="black" />
-            </Pressable>
-          </View>
-        </Stack>
-
-        <View className="flex-1 px-4">
-          <FlatList
-            data={DATA}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-            ListHeaderComponent={
-              <Text className="mt-4 mb-4 text-gray-600 text-xs">Total de 2 fotos</Text>
-            }
-            ListFooterComponent={
-              <Text className="mb-4 text-center text-gray-600 text-xs">Sem mais resultados</Text>
-            }
+    <View className="flex flex-1 bg-[#F6F6F6]">
+      <Stack href={'/(painel)/home'}>
+        <View className="flex-1 flex flex-row items-center gap-4">
+          <Image
+            className="rounded-full w-10 h-10"
+            source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }}
           />
         </View>
-      </SafeAreaView>
-    </SafeAreaProvider>
+        <View className="text-gray-900">
+          <Pressable className="p-5">
+            <FontAwesome6 name="ellipsis-vertical" size={24} color="black" />
+          </Pressable>
+        </View>
+      </Stack>
+
+      <View className="flex-1 px-4">
+        <FlatList
+          data={DATA}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          ListHeaderComponent={
+            <Text className="mt-4 mb-4 text-gray-600 text-xs">Total de 2 fotos</Text>
+          }
+          ListFooterComponent={
+            <Text className="mb-4 text-center text-gray-600 text-xs">Sem mais resultados</Text>
+          }
+        />
+      </View>
+    </View>
   );
 }
