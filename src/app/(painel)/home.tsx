@@ -122,6 +122,7 @@ export default function Home() {
 
   function openMenu() {
     setIsMenuOpen(curr => !curr)
+    console.log("clicou")
   }
 
   function navigateToFormGroup() {
@@ -129,35 +130,33 @@ export default function Home() {
   }
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView className="flex gap-4 flex-1 bg-[#F6F6F6] relative">
-        <Dropdown open={isMenuOpen} closeOnPress={openMenu} closeOnTouchMove={() => setIsMenuOpen(false)}>
-          <Pressable onPress={navigateToFormGroup}><Text>Novo grupo</Text></Pressable>
-          <Pressable><Text>Configurações</Text></Pressable>
-        </Dropdown>
+    <SafeAreaView className="flex gap-4 flex-1 bg-[#F6F6F6] relative">
+      <Dropdown open={isMenuOpen} closeOnPress={openMenu} closeOnTouchMove={() => setIsMenuOpen(false)}>
+        <Pressable onPress={navigateToFormGroup}><Text>Novo grupo</Text></Pressable>
+        <Pressable><Text>Configurações</Text></Pressable>
+      </Dropdown>
 
-        <View className="w-full h-[70px] flex flex-row items-center justify-between p-5">
-          <Text className="text-xl">Nome do app</Text>
-          <View className="flex flex-row gap-3 text-gray-900">
-            <Pressable onPress={navigateToNotifications}>
-              <Feather name="bell" size={24} color="black" />
-            </Pressable>
-            <Pressable onPress={openMenu}>
-              <FontAwesome6 name="ellipsis-vertical" size={24} color="black" />
-            </Pressable>
-          </View>
+      <View className="w-full h-[70px] flex flex-row items-center justify-between pl-5">
+        <Text className="text-xl">Nome do app</Text>
+        <View className="flex flex-row justify-center items-center text-gray-900">
+          <Pressable onPress={navigateToNotifications} className="p-5">
+            <Feather name="bell" size={24} color="black" />
+          </Pressable>
+          <Pressable onPress={openMenu} className="p-5">
+            <FontAwesome6 name="ellipsis-vertical" size={24} color="black" />
+          </Pressable>
         </View>
+      </View>
 
-        <View className="flex-1 px-4 pb-5">
-          <FlatList
-            data={DATA}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-            extraData={selectedId}
-            ListHeaderComponent={<ListHeader />}
-          />
-        </View>
-      </SafeAreaView> 
-    </SafeAreaProvider>
+      <View className="flex-1 px-4 pb-5">
+        <FlatList
+          data={DATA}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          extraData={selectedId}
+          ListHeaderComponent={<ListHeader />}
+        />
+      </View>
+    </SafeAreaView> 
   );
 }
