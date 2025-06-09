@@ -6,6 +6,9 @@ import api from "@/src/services/api";
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import Stack from "@/src/components/stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAuthStore } from "@/src/context/authContext";
+import { Asset } from "expo-asset";
+import { Group } from "@/src/interfaces/Group";
 
 export default function FormGroup() {
   const route = useRouter();
@@ -30,18 +33,30 @@ export default function FormGroup() {
   }
 
   async function save() {
+    const { id } = useAuthStore.getState();
     const obj = new FormData();
-    obj.set("name", groupName);
+    
     if (image?.output) {
       obj.set("image", image?.output[0]);
+    } else{
+      const asset = Asset.fromModule(require('../../../assets/images/groupNoImage.png'));
+      await asset.downloadAsync();
+      
+      obj.append("image", {
+        uri: asset.localUri || asset.uri,
+        type: "image/png",
+        name: "groupNoImage.png",
+      } as any);
     }
-    obj.set("adm", "360be7a2-0317-453d-8771-ac226c056032");
+    
+    obj.set("name", groupName);
+    obj.set("adm", String(id));
 
-    const res = await api.post("/api/group", obj, {
+    const res = await api.post<Group>("/api/group", obj, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    route.back();
+    route.replace(`./group/${res.data.id}`);
   }
 
   return (
@@ -97,14 +112,8 @@ export default function FormGroup() {
             <Text className="text-gray-900 font-semibold">
               Vinícius Fazolo (Você)
             </Text>
-          </View>
-          <View className="flex flex-row items-center gap-4">
-            <Image
-              className="rounded-full w-10 h-10"
-              source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }}
-            />
-            <Text className="text-gray-900">
-              nelsonfrjunior@gmail.com (Enviado)
+            <Text className="px-3 py-1 text-sm bg-green-200 text-green-600 rounded-3xl">
+              Admin
             </Text>
           </View>
         </View>
