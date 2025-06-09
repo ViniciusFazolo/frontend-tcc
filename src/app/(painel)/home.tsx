@@ -1,7 +1,10 @@
 import Dropdown from "@/src/components/dropdown";
+import { Group } from "@/src/interfaces/Group";
+import { API_BASE_URL, findAll } from "@/src/services/api";
 import { AntDesign, Feather, FontAwesome6 } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   FlatList,
   Image,
@@ -12,80 +15,21 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const DATA = [
-  {
-    id: "1",
-    nome: "Grupo da Família",
-    foto: "https://reactnative.dev/img/tiny_logo.png",
-    horario: "10:32",
-    notificacoes: 10,
-  },
-  {
-    id: "2",
-    nome: "Amigos do Futebol",
-    foto: "https://reactnative.dev/img/tiny_logo.png",
-    horario: "09:15",
-    notificacoes: 3,
-  },
-  {
-    id: "3",
-    nome: "Amigos do Futebol",
-    foto: "https://reactnative.dev/img/tiny_logo.png",
-    horario: "09:15",
-    notificacoes: 3,
-  },
-  {
-    id: "4",
-    nome: "Amigos do Futebol",
-    foto: "https://reactnative.dev/img/tiny_logo.png",
-    horario: "09:15",
-    notificacoes: 3,
-  },
-  {
-    id: "5",
-    nome: "Amigos do Futebol",
-    foto: "https://reactnative.dev/img/tiny_logo.png",
-    horario: "09:15",
-    notificacoes: 3,
-  },
-  {
-    id: "6",
-    nome: "Amigos do Futebol",
-    foto: "https://reactnative.dev/img/tiny_logo.png",
-    horario: "09:15",
-    notificacoes: 3,
-  },
-  {
-    id: "7",
-    nome: "Amigos do Futebol",
-    foto: "https://reactnative.dev/img/tiny_logo.png",
-    horario: "09:15",
-    notificacoes: 3,
-  },
-  {
-    id: "8",
-    nome: "Amigos do Futebol",
-    foto: "https://reactnative.dev/img/tiny_logo.png",
-    horario: "09:15",
-    notificacoes: 3,
-  },
-  // ... mais dados
-];
-
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+  const [groups, setGroups] = useState<Group[]>([])
   const router = useRouter();
 
-  const renderItem = ({ item }: any) => (
+  const renderItem = ({ item }: { item: Group }) => (
     <Pressable onPress={() => {router.navigate(`/group/${item.id}`)}} className="h-[70px] shadow-[0_0_10px_rgba(0,0,0,0.03)] bg-white border border-gray-200 p-4 w-full flex flex-row items-center gap-3 rounded-3xl mb-2">
-      <Image className="rounded-full w-12 h-12" source={{ uri: item.foto }} />
-      <Text className="text-base text-gray-900 flex-1">{item.nome}</Text>
+      <Image className="rounded-full w-12 h-12" source={{ uri: item.image }} />
+      <Text className="text-base text-gray-900 flex-1">{item.name}</Text>
       <View className="flex flex-col items-center gap-1">
-        <Text className="text-gray-600 font-semibold text-xs">{item.horario}</Text>
+        {/* <Text className="text-gray-600 font-semibold text-xs">{item.}</Text>
         <Text className="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-xs">
           {item.notificacoes}
-        </Text>
+        </Text> */}
       </View>
     </Pressable>
   );
@@ -130,6 +74,13 @@ export default function Home() {
     openMenu()
   }
 
+  useFocusEffect(
+    useCallback(() => {
+      findAll<Group>(`${API_BASE_URL}/api/group`)
+        .then(res => setGroups(res));
+    }, [])
+  );
+
   return (
     <SafeAreaView className="flex gap-4 flex-1 bg-[#F6F6F6] relative">
       <Dropdown open={isMenuOpen} closeOnPress={openMenu} closeOnTouchMove={() => setIsMenuOpen(false)}>
@@ -151,9 +102,9 @@ export default function Home() {
 
       <View className="flex-1 px-4 pb-5">
         <FlatList
-          data={DATA}
+          data={groups}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id!}
           extraData={selectedId}
           ListHeaderComponent={<ListHeader />}
         />

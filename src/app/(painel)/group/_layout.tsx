@@ -1,8 +1,11 @@
 import React from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Layout() {
+  const insets = useSafeAreaInsets()
+
   return (
     <Tabs
       screenOptions={{
@@ -10,7 +13,7 @@ export default function Layout() {
         headerShown: false,
         tabBarStyle: {
           borderTopWidth: 0,
-          height: 70
+          height: insets.bottom + 60,
         }
       }}
     >
@@ -21,7 +24,7 @@ export default function Layout() {
             <Ionicons name="aperture-outline" size={60} color="#A93F2A" />
           ),
           tabBarIconStyle: {
-            height: '100%',
+            height: 60,
             width: 60
           }
         }}
