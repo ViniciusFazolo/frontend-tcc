@@ -1,10 +1,11 @@
 import Dropdown from "@/src/components/dropdown";
+import { useAuthStore } from "@/src/context/authContext";
 import { Group } from "@/src/interfaces/Group";
 import { API_BASE_URL, findAll } from "@/src/services/api";
 import { AntDesign, Feather, FontAwesome6 } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import { useRouter } from "expo-router";
+import React, { useCallback, useState } from "react";
 import {
   FlatList,
   Image,
@@ -20,6 +21,7 @@ export default function Home() {
   const [selectedId, setSelectedId] = useState(null);
   const [groups, setGroups] = useState<Group[]>([])
   const router = useRouter();
+  const auth = useAuthStore()
 
   const renderItem = ({ item }: { item: Group }) => (
     <Pressable onPress={() => {router.navigate(`/group/${item.id}`)}} className="h-[70px] shadow-[0_0_10px_rgba(0,0,0,0.03)] bg-white border border-gray-200 p-4 w-full flex flex-row items-center gap-3 rounded-3xl mb-2">
@@ -74,6 +76,11 @@ export default function Home() {
     openMenu()
   }
 
+  function logout() {
+    auth.logout()
+    router.replace('/')
+  }
+
   useFocusEffect(
     useCallback(() => {
       findAll<Group>(`${API_BASE_URL}/api/group`)
@@ -86,6 +93,7 @@ export default function Home() {
       <Dropdown open={isMenuOpen} closeOnPress={openMenu} closeOnTouchMove={() => setIsMenuOpen(false)}>
         <Pressable onPress={navigateToFormGroup} className="p-4"><Text>Novo grupo</Text></Pressable>
         <Pressable className="p-4"><Text>Configurações</Text></Pressable>
+        <Pressable onPress={logout} className="p-4"><Text>Sair</Text></Pressable>
       </Dropdown>
 
       <View className="w-full h-[70px] flex flex-row items-center justify-between pl-5">
