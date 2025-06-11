@@ -50,12 +50,8 @@ export default function AddAlbumScreen() {
     try {
       const obj = new FormData();
 
-      if (image) {
-        obj.append("image", {
-          uri: image.uri,
-          name: image.fileName || "image.jpg",
-          type: image.type || "image/jpeg",
-        } as any);
+      if (image?.file) {
+        obj.append('image', image.file)
       } else {
         const asset = Asset.fromModule(require("../../../../../assets/images/albumNoImage.png"));
         await asset.downloadAsync();
