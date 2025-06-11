@@ -1,6 +1,5 @@
 import { useRouter } from "expo-router";
 import { Image, Pressable, Text, TextInput, View } from "react-native";
-import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import api from "@/src/services/api";
@@ -14,7 +13,6 @@ import { Group } from "@/src/interfaces/Group";
 export default function FormGroup() {
   const route = useRouter();
   const insets = useSafeAreaInsets();
-  //const [image, setImage] = useState<DocumentPicker.DocumentPickerResult>();
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [groupName, setGroupName] = useState<string>("");
 
@@ -43,12 +41,8 @@ export default function FormGroup() {
       return;
     }
 
-    if (image) {
-      obj.append("image", {
-        uri: image.uri,
-        name: image.fileName || "image.jpg",
-        type: image.type || "image/jpeg",
-      } as any);
+    if (image?.file) {
+      obj.append('image', image.file)
     } else {
       const asset = Asset.fromModule(require("../../../assets/images/groupNoImage.png"));
       await asset.downloadAsync();
@@ -71,46 +65,6 @@ export default function FormGroup() {
 
     route.replace(`./group/${res.data.id}`);
   }
-
-
-  // async function pickDocument() {
-  //   try {
-  //     const result = await DocumentPicker.getDocumentAsync({
-  //       copyToCacheDirectory: true,
-  //     });
-  //     setImage(result);
-  //     console.log(result);
-  //   } catch (err) {
-  //     alert("Erro ao inserir imagem");
-  //   }
-  // }
-
-  // async function save() {
-  //   const { id } = useAuthStore.getState();
-  //   const obj = new FormData();
-    
-  //   if (image?.output) {
-  //     obj.set("image", image?.output[0]);
-  //   } else{
-  //     const asset = Asset.fromModule(require('../../../assets/images/groupNoImage.png'));
-  //     await asset.downloadAsync();
-      
-  //     obj.append("image", {
-  //       uri: asset.localUri || asset.uri,
-  //       type: "image/png",
-  //       name: "groupNoImage.png",
-  //     } as any);
-  //   }
-    
-  //   obj.set("name", groupName);
-  //   obj.set("adm", String(id));
-
-  //   const res = await api.post<Group>("/api/group", obj, {
-  //     headers: { "Content-Type": "multipart/form-data" },
-  //   });
-
-  //   route.replace(`./group/${res.data.id}`);
-  // }
 
   return (
     <View style={{ marginTop: insets.top, marginBottom: insets.bottom }} className="flex-1">
