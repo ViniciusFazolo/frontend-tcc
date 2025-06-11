@@ -1,8 +1,8 @@
 import axios from "axios";
 
-// export const API_BASE_URL = "http://10.0.2.2:8080"; //localhost no emulador android
-export const API_BASE_URL = "http://localhost:8080"; //meu ip
-
+//export const API_BASE_URL = "http://10.0.2.2:8080"; //localhost no emulador android
+//export const API_BASE_URL = "http://localhost:8080"; //meu ip
+export const API_BASE_URL = "http://192.168.6.102:8080";
 const api = axios.create({
     baseURL: API_BASE_URL,
     headers: {
