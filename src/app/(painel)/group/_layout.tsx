@@ -40,7 +40,7 @@ export default function Layout() {
       />
       <Tabs.Screen name="[id]" options={{ href: null }} />
       <Tabs.Screen
-        name="add-album/index"
+        name="[id]/add-album"
         options={{ href: null, tabBarStyle: { display: "none" } }}
       />
       <Tabs.Screen
