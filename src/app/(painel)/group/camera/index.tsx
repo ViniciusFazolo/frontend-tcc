@@ -1,8 +1,8 @@
 import Stack from "@/src/components/stack";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
-import { useNavigation } from "expo-router";
-import { useLayoutEffect, useRef, useState } from "react";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   Button,
   Image,
@@ -81,6 +81,11 @@ export default function Camera() {
     setImages(images.filter((_, i) => i !== index));
 
     setUri(images[index - 1]);
+  }
+
+  function navigateToAddPhoto() {
+    const encodedImages = images.map(img => encodeURIComponent(img)).join(',');
+    router.push(`/(painel)/group/add-photo/?images=${encodedImages}`);
   }
 
   function renderCamera() {
@@ -185,7 +190,10 @@ export default function Camera() {
               color="white"
             />
           </TouchableOpacity>
-          <Pressable className="items-center justify-center w-16 h-16 bg-green-900 rounded-full">
+          <Pressable 
+            onPress={navigateToAddPhoto}
+            className="items-center justify-center w-16 h-16 bg-green-900 rounded-full"
+          >
             <Ionicons name="arrow-forward" size={35} color="white" />
           </Pressable>
         </View>
