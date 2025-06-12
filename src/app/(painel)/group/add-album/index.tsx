@@ -1,4 +1,4 @@
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useRouter } from "expo-router";
 import { Image, Pressable, Text, TextInput, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
@@ -8,18 +8,18 @@ import Stack from "@/src/components/stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Asset } from "expo-asset";
 import { Album } from "@/src/interfaces/Album";
+import { useGroupStore } from "@/src/context/groupContext";
 
 export default function AddAlbumScreen() {
   const route = useRouter();
   const insets = useSafeAreaInsets();
-  const { id: groupId } = useLocalSearchParams(); // id do grupo
+  const { currentGroupId } = useGroupStore();
 
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [albumName, setAlbumName] = useState<string>("");
 
   function handleBackPage() {
-    const finalGroupId = Array.isArray(groupId) ? groupId[0] : groupId;
-    route.replace(`/(painel)/group/${finalGroupId}`);
+    route.replace(`/(painel)/group/${currentGroupId}`);
   }
 
   async function pickImage() {
@@ -40,9 +40,8 @@ export default function AddAlbumScreen() {
       return;
     }
 
-    const finalGroupId = Array.isArray(groupId) ? groupId[0] : groupId;
 
-    if (!finalGroupId) {
+    if (!currentGroupId) {
       alert("ID do grupo não encontrado");
       return;
     }
@@ -64,7 +63,7 @@ export default function AddAlbumScreen() {
       }
 
       obj.append("name", albumName);
-      obj.append("group", String(finalGroupId)); // vínculo com o grupo
+      obj.append("group", String(currentGroupId)); // vínculo com o grupo
 
       const res = await api.post<Album>(`/api/album`, obj, {
         headers: {
@@ -72,7 +71,7 @@ export default function AddAlbumScreen() {
         },
       });
 
-      route.replace(`/(painel)/group/${finalGroupId}`);
+      route.replace(`/(painel)/group/${currentGroupId}`);
 
     } catch (error: any) {
       console.error("Erro ao criar álbum:", error);
@@ -82,7 +81,7 @@ export default function AddAlbumScreen() {
 
   return (
     <View style={{ marginTop: insets.top, marginBottom: insets.bottom }} className="flex-1">
-      <Stack href={`/(painel)/group/${Array.isArray(groupId) ? groupId[0] : groupId}`}>
+      <Stack href={`/(painel)/group/${currentGroupId}`}>
         <Pressable onPress={handleBackPage}>
           <Text className="text-gray-900">Voltar</Text>
         </Pressable>
@@ -117,7 +116,11 @@ export default function AddAlbumScreen() {
 
       <Pressable
         onPress={save}
+        disabled={!albumName.trim()}
         className="mb-5 absolute bottom-0 right-0 mr-5 flex items-center justify-center rounded-full w-16 h-16 bg-green-900 text-green-100"
+        style={{
+          opacity: !albumName.trim() ? 0.5 : 1,
+        }}
       >
         <AntDesign name="check" size={35} color="white" />
       </Pressable>

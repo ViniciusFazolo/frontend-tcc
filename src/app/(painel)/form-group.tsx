@@ -128,7 +128,11 @@ export default function FormGroup() {
 
       <Pressable
         onPress={save}
+        disabled={!groupName.trim()}
         className="mb-5 absolute bottom-0 right-0 mr-5 flex items-center justify-center rounded-full w-16 h-16 bg-green-900 text-green-100"
+        style={{
+          opacity: !groupName.trim() ? 0.5 : 1,
+        }}
       >
         <AntDesign name="check" size={35} color="white" />
       </Pressable>
