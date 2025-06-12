@@ -9,19 +9,23 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Group } from "@/src/interfaces/Group";
 import { Album } from "@/src/interfaces/Album";
 import api from "@/src/services/api";
+import { useGroupStore } from "@/src/context/groupContext";
 
 export default function GroupScreen() {
    const route = useRouter()
    const insets = useSafeAreaInsets()
    const { id } = useLocalSearchParams() //pega o id da que ta na rota
-   
+   const { setCurrentGroupId } = useGroupStore();
    const [isMenuOpen, setIsMenuOpen] = useState(false);
    const [group, setGroup] = useState<Group | null>(null);
    const [albums, setAlbums] = useState<Album[]>([]);
    const [loading, setLoading] = useState(true);
 
    useEffect(() => {
-    loadGroupData();
+    if (id && typeof id === 'string') {
+      setCurrentGroupId(id); // salva no zustand
+      loadGroupData();
+    }
   }, [id]);
 
   async function loadGroupData() {
@@ -43,7 +47,7 @@ export default function GroupScreen() {
   }
 
    function navigateToAddAlbum() {
-    route.navigate(`/group/${id}/add-album`)
+    route.navigate(`/group/add-album`)
   }
 
    function navigateToAlbum(id: string){
