@@ -62,7 +62,6 @@ export default function Camera() {
     if(photo) {
       const respnse = await fetch(photo?.uri)
       const blob = await respnse.blob()
-      console.log(blob)
       const unifiedImage: UnifiedImage = {
         uri: photo?.uri,
         blob: blob
@@ -71,7 +70,6 @@ export default function Camera() {
       setImages((curr) => [...curr, unifiedImage]);
       setUri(photo?.uri!);
       handleSetCurrentStep("preview")
-      console.log(photo)
       return
     }
 
@@ -96,7 +94,6 @@ export default function Camera() {
       });
 
       setUri(result.assets[0].uri);
-      console.log(result)
       handleSetCurrentStep("preview")
       return
     }

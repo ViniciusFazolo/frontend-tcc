@@ -68,7 +68,6 @@ export default function Home() {
 
   function openMenu() {
     setIsMenuOpen(curr => !curr)
-    console.log("clicou")
   }
 
   function navigateToFormGroup() {
