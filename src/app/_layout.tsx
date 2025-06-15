@@ -11,7 +11,7 @@ export default function MainLayout(){
                 options={{ headerShown: false }}
             />
             <Stack.Screen
-                name="(auth)/signup/signup"
+                name="signup"
                 options={{ headerShown: false }}
             /> 
             <Stack.Screen

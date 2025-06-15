@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { Image, Pressable, Text, TextInput, View, ScrollView, Alert, FlatList } from "react-native";
+import { Image, Pressable, Text, TextInput, View, ScrollView, Alert, FlatList, Platform } from "react-native";
 import { useState, useEffect } from "react";
 import api from "@/src/services/api";
 import { AntDesign } from "@expo/vector-icons";
@@ -65,7 +65,15 @@ export default function AddPhotoScreen({unifiedImages}: Props) {
       for (const image of images) {
         const formData = new FormData();
 
-        formData.append('image', image.blob)
+        if (Platform.OS === 'web') {
+          formData.append('image', image.blob);
+        } else {
+          formData.append('image', {
+            uri: image.uri,
+            type: 'image/jpeg',
+            name: `photo_${Date.now()}.jpg`,
+          } as any);
+        }
         formData.append('description', description);
         formData.append('album', selectedAlbum.id);
         formData.append('author', loginResponse.id)

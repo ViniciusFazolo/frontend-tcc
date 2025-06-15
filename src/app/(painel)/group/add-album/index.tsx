@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { Image, Pressable, Text, TextInput, View } from "react-native";
+import { Image, Platform, Pressable, Text, TextInput, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
 import api from "@/src/services/api";
@@ -49,17 +49,33 @@ export default function AddAlbumScreen() {
     try {
       const obj = new FormData();
 
-      if (image?.file) {
-        obj.append('image', image.file)
+      if (image) {
+        if (Platform.OS === 'web') {
+          if (image.file) {
+            obj.append('image', image.file);
+          }
+        } else {
+          obj.append('image', {
+            uri: image.uri,
+            type: image.type || 'image/jpeg',
+            name: image.fileName || 'image.jpg',
+          } as any);
+        }
       } else {
         const asset = Asset.fromModule(require("../../../../../assets/images/albumNoImage.png"));
         await asset.downloadAsync();
 
-        //transform to blob
-        const assetFetch = await fetch(asset?.uri)
-        const blob = await assetFetch.blob()
-        
-        obj.append("image", blob);
+        if (Platform.OS === 'web') {
+          const assetFetch = await fetch(asset?.uri);
+          const blob = await assetFetch.blob();
+          obj.append("image", blob);
+        } else {
+          obj.append("image", {
+            uri: asset.uri,
+            type: 'image/png',
+            name: 'albumNoImage.png',
+          } as any);
+        }
       }
 
       obj.append("name", albumName);

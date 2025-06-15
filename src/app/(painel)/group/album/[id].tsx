@@ -5,9 +5,11 @@ import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, FlatList, Image, Pressable, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Album() {
   const {id} = useLocalSearchParams()
+  const insets = useSafeAreaInsets()
   const [publishs, setPublishs] = useState<Publish[]>([])
 
   useEffect(() => {
@@ -31,7 +33,6 @@ export default function Album() {
         whenSent: formatter.format(new Date(item.whenSent)),
       }));
       
-      console.log(obj)
       setPublishs(obj)
     } catch {
       Alert.alert("Erro ao carregar as fotos")
@@ -70,7 +71,7 @@ export default function Album() {
   }
 
   return (
-    <View className="flex flex-1 bg-[#F6F6F6]">
+    <View style={{marginTop: insets.top}} className="flex flex-1 bg-[#F6F6F6]">
       <Stack href={'/(painel)/home'}>
         <View className="flex-1 flex flex-row items-center gap-4">
           <Image

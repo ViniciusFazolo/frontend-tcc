@@ -83,7 +83,7 @@ export default function Login() {
                         </Text>
                     </Pressable>
 
-                    <Link href={'./(auth)/signup/signup'} className="text-center mt-4 text-sm">
+                    <Link href={'/signup/signup'} className="text-center mt-4 text-sm">
                         Ainda não possui uma conta? <Text className="text-[#A93F2A] font-semibold">Cadastre-se</Text>
                     </Link>
                 </View>
