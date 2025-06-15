@@ -7,7 +7,6 @@ import Stack from "@/src/components/stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Album } from "@/src/interfaces/Album";
 import { Publish } from "@/src/interfaces/Publish";
-import { useGroupStore } from "@/src/context/groupContext";
 import { UnifiedImage } from "@/src/interfaces/UnifiedImages";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LoginResponse } from "@/src/interfaces/LoginResponse";
@@ -19,7 +18,6 @@ interface Props {
 export default function AddPhotoScreen({unifiedImages}: Props) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { currentGroupId } = useGroupStore();
   const [images, setImages] = useState<UnifiedImage[]>(unifiedImages);
   const [description, setDescription] = useState<string>("");
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
@@ -32,9 +30,11 @@ export default function AddPhotoScreen({unifiedImages}: Props) {
   }, []);
 
   async function loadAlbums() {
+    const groupId: string = await AsyncStorage.getItem('groupId') ?? ''
+
     try {
       setLoading(true);
-      const response = await api.get<Album[]>(`/api/album/group/${currentGroupId}`);
+      const response = await api.get<Album[]>(`/api/album/group/${groupId}`);
       setAlbums(response.data);
     } catch (error) {
       console.error('Erro ao carregar álbuns:', error);

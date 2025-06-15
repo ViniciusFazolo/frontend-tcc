@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 
 interface GroupState {
@@ -8,6 +9,8 @@ interface GroupState {
 
 export const useGroupStore = create<GroupState>((set) => ({
   currentGroupId: null,
-  setCurrentGroupId: (id: string) => set({ currentGroupId: id }),
+  setCurrentGroupId: async (id: string) => {
+    await AsyncStorage.setItem('groupId', id)
+  },
   clearCurrentGroupId: () => set({ currentGroupId: null }),
 }));
