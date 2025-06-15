@@ -6,9 +6,10 @@ import api from "@/src/services/api";
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import Stack from "@/src/components/stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAuthStore } from "@/src/context/authContext";
 import { Asset } from "expo-asset";
 import { Group } from "@/src/interfaces/Group";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LoginResponse } from "@/src/interfaces/LoginResponse";
 
 export default function FormGroup() {
   const route = useRouter();
@@ -33,7 +34,7 @@ export default function FormGroup() {
   }
 
   async function save() {
-    const { id } = useAuthStore.getState();
+    const loginResponse: LoginResponse = JSON.parse(await AsyncStorage.getItem('authData') ?? '')
     const obj = new FormData();
 
     if (!groupName.trim()) {
@@ -71,7 +72,7 @@ export default function FormGroup() {
     }
 
     obj.append("name", groupName);
-    obj.append("adm", String(id));
+    obj.append("adm", loginResponse.id);
 
     const res = await api.post<Group>("/api/group", obj, {
       headers: {
