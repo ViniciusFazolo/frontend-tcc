@@ -47,11 +47,11 @@ export default function FormGroup() {
       const asset = Asset.fromModule(require("../../../assets/images/groupNoImage.png"));
       await asset.downloadAsync();
 
-      obj.append("image", {
-        uri: asset.localUri || asset.uri,
-        name: "groupNoImage.png",
-        type: "image/png",
-      } as any);
+      // transform to blob
+      const assetFetch = await fetch(asset?.uri)
+      const blob = await assetFetch.blob()
+      
+      obj.append("image", blob);
     }
 
     obj.append("name", groupName);
