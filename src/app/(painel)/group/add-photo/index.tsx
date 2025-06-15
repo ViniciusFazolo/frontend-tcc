@@ -1,4 +1,4 @@
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useRouter } from "expo-router";
 import { Image, Pressable, Text, TextInput, View, ScrollView, Alert, FlatList } from "react-native";
 import { useState, useEffect } from "react";
 import api from "@/src/services/api";
@@ -8,27 +8,28 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Album } from "@/src/interfaces/Album";
 import { Publish } from "@/src/interfaces/Publish";
 import { useGroupStore } from "@/src/context/groupContext";
+import { UnifiedImage } from "@/src/interfaces/UnifiedImages";
+import { useAuthStore } from "@/src/context/authContext";
 
-export default function AddPhotoScreen() {
+interface Props {
+  unifiedImages: UnifiedImage[]
+}
+
+export default function AddPhotoScreen({unifiedImages}: Props) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { images } = useLocalSearchParams(); // URIs das imagens codificadas
   const { currentGroupId } = useGroupStore();
-  const [imageUris, setImageUris] = useState<string[]>([]);
+  const [images, setImages] = useState<UnifiedImage[]>(unifiedImages);
   const [description, setDescription] = useState<string>("");
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
   const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const {id} = useAuthStore()
 
   useEffect(() => {
-    if (images) {
-      const decodedImages = (images as string).split(',').map(img => decodeURIComponent(img));
-      setImageUris(decodedImages);
-    }
-    
     loadAlbums();
-  }, [images]);
+  }, []);
 
   async function loadAlbums() {
     try {
@@ -53,23 +54,19 @@ export default function AddPhotoScreen() {
       return;
     }
 
-    if (imageUris.length === 0) {
+    if (images.length === 0) {
       Alert.alert("Erro", "Nenhuma imagem selecionada");
       return;
     }
 
     try {
-      for (const imageUri of imageUris) {
+      for (const image of images) {
         const formData = new FormData();
-        
-        formData.append('image', {
-          uri: imageUri,
-          name: `photo_${Date.now()}.jpg`,
-          type: 'image/jpeg',
-        } as any);
-        
+
+        formData.append('image', image.blob)
         formData.append('description', description);
         formData.append('album', selectedAlbum.id);
+        formData.append('author', id!)
 
         await api.post<Publish>('/api/publish', formData, {
           headers: {
@@ -129,26 +126,25 @@ export default function AddPhotoScreen() {
         {/* Preview das imagens */}
         <View className="mb-6">
           <Text className="text-lg font-semibold text-gray-900 mb-3">
-            Fotos selecionadas ({imageUris.length})
+            Fotos selecionadas ({images.length})
           </Text>
           
-          {imageUris.length > 0 && (
             <View>
               <View className="h-64 bg-gray-100 rounded-xl overflow-hidden mb-3">
                 <Image
-                  source={{ uri: imageUris[currentImageIndex] }}
+                  source={{ uri: images[currentImageIndex].uri }}
                   className="w-full h-full"
                   resizeMode="cover"
                 />
               </View>
               
-              {imageUris.length > 1 && (
+              {images.length > 1 && (
                 <ScrollView 
                   horizontal 
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={{ gap: 8 }}
                 >
-                  {imageUris.map((uri, index) => (
+                  {images.map((image, index) => (
                     <Pressable
                       key={index}
                       onPress={() => setCurrentImageIndex(index)}
@@ -157,7 +153,7 @@ export default function AddPhotoScreen() {
                       }`}
                     >
                       <Image
-                        source={{ uri }}
+                        source={{ uri: image.uri }}
                         className="w-full h-full"
                         resizeMode="cover"
                       />
@@ -166,7 +162,6 @@ export default function AddPhotoScreen() {
                 </ScrollView>
               )}
             </View>
-          )}
         </View>
 
         {/* Campo de descrição */}
@@ -213,9 +208,9 @@ export default function AddPhotoScreen() {
       <Pressable
         onPress={savePhoto}
         className="m-5 flex items-center justify-center rounded-full w-16 h-16 bg-green-900 self-end"
-        disabled={!selectedAlbum || imageUris.length === 0}
+        disabled={!selectedAlbum || images.length === 0}
         style={{
-          opacity: !selectedAlbum || imageUris.length === 0 ? 0.5 : 1
+          opacity: !selectedAlbum || images.length === 0 ? 0.5 : 1
         }}
       >
         <AntDesign name="check" size={35} color="white" />

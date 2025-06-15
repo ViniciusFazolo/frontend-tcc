@@ -1,8 +1,8 @@
 import Stack from "@/src/components/stack";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
-import { router, useLocalSearchParams, useNavigation } from "expo-router";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { CameraView, CameraType, useCameraPermissions, CameraCapturedPicture } from "expo-camera";
+import { router, useNavigation } from "expo-router";
+import { useLayoutEffect, useRef, useState } from "react";
 import {
   Button,
   Image,
@@ -12,9 +12,14 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
+  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
+import AddPhotoScreen from "../add-photo";
+import { UnifiedImage } from "@/src/interfaces/UnifiedImages";
+
+type CurrentStep = "camera" | "preview" | "details" 
 
 export default function Camera() {
   const [facing, setFacing] = useState<CameraType>("back");
@@ -23,7 +28,8 @@ export default function Camera() {
   const insets = useSafeAreaInsets();
   const ref = useRef<CameraView>(null);
   const [uri, setUri] = useState<string>("");
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<UnifiedImage[]>([]);
+  const [currentStep, setCurrentStep] = useState<CurrentStep>("camera") 
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -52,8 +58,24 @@ export default function Camera() {
 
   async function takePicture() {
     const photo = await ref.current?.takePictureAsync();
-    setImages((curr) => [...curr, photo?.uri!]);
-    setUri(photo?.uri!);
+    
+    if(photo) {
+      const respnse = await fetch(photo?.uri)
+      const blob = await respnse.blob()
+      console.log(blob)
+      const unifiedImage: UnifiedImage = {
+        uri: photo?.uri,
+        blob: blob
+      }
+
+      setImages((curr) => [...curr, unifiedImage]);
+      setUri(photo?.uri!);
+      handleSetCurrentStep("preview")
+      console.log(photo)
+      return
+    }
+
+    Alert.alert("Erro", "Erro ao capturar foto, tente novamente")
   }
 
   async function pickImage() {
@@ -66,11 +88,20 @@ export default function Camera() {
 
     if (!result.canceled) {
       result.assets?.forEach((item) => {
-        setImages((curr) => [...curr, item.uri]);
+        const unifiedImage: UnifiedImage = {
+          uri: item.uri,
+          blob: item.file!
+        }
+        setImages((curr) => [...curr, unifiedImage]);
       });
 
       setUri(result.assets[0].uri);
+      console.log(result)
+      handleSetCurrentStep("preview")
+      return
     }
+
+    Alert.alert("Erro", "Erro ao selecionar imagens, tente novamente")
   }
 
   function cancelPicture() {
@@ -80,12 +111,7 @@ export default function Camera() {
   function deleteImage(index: number) {
     setImages(images.filter((_, i) => i !== index));
 
-    setUri(images[index - 1]);
-  }
-
-  function navigateToAddPhoto() {
-    const encodedImages = images.map(img => encodeURIComponent(img)).join(',');
-    router.push(`/(painel)/group/add-photo/?images=${encodedImages}`);
+    setUri(images[index - 1].uri);
   }
 
   function renderCamera() {
@@ -160,12 +186,12 @@ export default function Camera() {
               {images.map((image, index) => (
                 <TouchableOpacity
                   key={index}
-                  onPress={() => setUri(image)}
+                  onPress={() => setUri(image.uri)}
                   className={`h-16 w-16 rounded-md overflow-hidden`}
                 >
-                  <Image source={{ uri: image }} className="w-full h-full" />
+                  <Image source={{ uri: image.uri }} className="w-full h-full" />
 
-                  {image === uri && (
+                  {image.uri === uri && (
                     <Pressable
                       onPress={() => deleteImage(index)}
                       className="w-16 h-16 absolute bg-black/40 items-center justify-center"
@@ -191,7 +217,7 @@ export default function Camera() {
             />
           </TouchableOpacity>
           <Pressable 
-            onPress={navigateToAddPhoto}
+            onPress={() => handleSetCurrentStep("details")}
             className="items-center justify-center w-16 h-16 bg-green-900 rounded-full"
           >
             <Ionicons name="arrow-forward" size={35} color="white" />
@@ -201,9 +227,21 @@ export default function Camera() {
     );
   }
 
+  function handleSetCurrentStep(step: CurrentStep) {
+    setCurrentStep(step)
+  }
+
+  function selectStep() {
+    switch(currentStep) {
+      case "camera": return renderCamera()
+      case "preview": return renderImageCaptured()
+      default: return <AddPhotoScreen unifiedImages={images}/>
+    }
+  }
+
   return (
     <View style={styles.container}>
-      {images.length > 0 ? renderImageCaptured() : renderCamera()}
+      {selectStep()}
     </View>
   );
 }
