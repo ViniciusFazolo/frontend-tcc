@@ -1,29 +1,78 @@
 import React, { useState } from "react";
 import colors from "@/src/constants/colors";
-import { View, Text, StyleSheet, TextInput, Pressable, SafeAreaView, ScrollView, ActivityIndicator, Image } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, TextInput, Pressable, SafeAreaView, ScrollView, ActivityIndicator, Image, Platform } from "react-native";
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from "expo-router";
 import api from "@/src/services/api";
-import fonts from "../constants/fonts";
+import fonts from "@/src/constants/fonts";
+import * as ImagePicker from "expo-image-picker";
+import { Asset } from "expo-asset";
 
 export default function SignUp() {
-
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+
+    async function pickImage() {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: 'images',
+            allowsEditing: true,
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setImage(result.assets[0]);
+        }
+    }
 
     async function handleSignUp() {
         setLoading(true);
         setErrorMessage('');
 
         try {
-            const response = await api.post("/auth/register", {
-                name: name,
-                login: email,
-                password: password,
-                role: "USER"
+            const formData = new FormData();
+
+            if (image) {
+                if (Platform.OS === 'web') {
+                    if (image.file) {
+                        formData.append('image', image.file);
+                    }
+                } else {
+                    formData.append('image', {
+                        uri: image.uri,
+                        type: image.type || 'image/jpeg',
+                        name: image.fileName || 'profile.jpg',
+                    } as any);
+                }
+            } else {
+                const asset = Asset.fromModule(require("../../assets/images/userNoImage.png")); 
+                await asset.downloadAsync();
+
+                if (Platform.OS === 'web') {
+                    const assetFetch = await fetch(asset?.uri);
+                    const blob = await assetFetch.blob();
+                    formData.append("image", blob);
+                } else {
+                    formData.append("image", {
+                        uri: asset.uri,
+                        type: 'image/png',
+                        name: 'default-avatar.png',
+                    } as any);
+                }
+            }
+
+            formData.append("name", name);
+            formData.append("login", email);
+            formData.append("password", password);
+            formData.append("role", "USER");
+
+            const response = await api.post("/auth/register", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
             });
 
             router.push("/");
@@ -39,7 +88,6 @@ export default function SignUp() {
             <ScrollView style={{ flex: 1, backgroundColor: colors.white }}>
                 <View style={styles.container}>
                     <View style={styles.header}>
-
                         <Pressable
                             style={styles.backButton}
                             onPress={() => router.back()}
@@ -56,6 +104,30 @@ export default function SignUp() {
                     </View>
 
                     <View style={styles.form}>
+                        <View style={styles.imageContainer}>
+                            <Text style={styles.label}>Foto de perfil</Text>
+                            <Pressable
+                                onPress={pickImage}
+                                style={styles.imagePickerButton}
+                            >
+                                {image ? (
+                                    <Image
+                                        style={styles.profileImage}
+                                        source={{ uri: image.uri }}
+                                    />
+                                ) : (
+                                    <View style={styles.imagePlaceholder}>
+                                        <MaterialCommunityIcons
+                                            name="camera-plus"
+                                            size={40}
+                                            color={colors.gray}
+                                        />
+                                        <Text style={styles.imageText}>Adicionar foto</Text>
+                                    </View>
+                                )}
+                            </Pressable>
+                        </View>
+
                         <View>
                             <Text style={styles.label}>Nome completo</Text>
                             <TextInput
@@ -101,17 +173,10 @@ export default function SignUp() {
                                 <Text style={styles.buttonText}>Cadastrar</Text>
                             )}
                         </Pressable>
-
-                        <View style={styles.imageView}>
-                        </View>
-
                     </View>
-
                 </View>
             </ScrollView>
-
         </SafeAreaView>
-
     )
 }
 
@@ -146,6 +211,38 @@ const styles = StyleSheet.create({
         paddingTop: 24,
         paddingLeft: 14,
         paddingRight: 14
+    },
+    imageContainer: {
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    imagePickerButton: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        overflow: 'hidden',
+    },
+    profileImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 60,
+    },
+    imagePlaceholder: {
+        width: '100%',
+        height: '100%',
+        backgroundColor: colors.gray + '20',
+        borderRadius: 60,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: colors.gray,
+        borderStyle: 'dashed',
+    },
+    imageText: {
+        fontFamily: fonts.font,
+        color: colors.gray,
+        fontSize: 12,
+        marginTop: 4,
     },
     label: {
         fontFamily: fonts.font,
@@ -190,17 +287,4 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         textAlign: "center"
     },
-    imageView: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    image: {
-        width: "100%",
-        height: "100%",
-        maxWidth: 400,
-        maxHeight: 400,
-        aspectRatio: 1,
-        resizeMode: "contain",
-    }
 });
