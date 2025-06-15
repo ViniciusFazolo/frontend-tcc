@@ -25,7 +25,7 @@ export const useAuthStore = create<AuthState>((set) => ({
             token: obj.token,
             id: obj.id,
             role: obj.role,
-            loginName: obj.login,
+            loginName: obj.loginName,
         };
         await AsyncStorage.setItem("authData", JSON.stringify(authData));
         set({ ...authData, isAuthenticated: true });
@@ -45,7 +45,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     loadToken: async () => {
         const stored = await AsyncStorage.getItem("authData");
         if (stored) {
-            const parsed = JSON.parse(stored);
+            const parsed: LoginResponse = JSON.parse(stored);
             set({
                 token: parsed.token,
                 id: parsed.id,

@@ -9,7 +9,8 @@ import { Album } from "@/src/interfaces/Album";
 import { Publish } from "@/src/interfaces/Publish";
 import { useGroupStore } from "@/src/context/groupContext";
 import { UnifiedImage } from "@/src/interfaces/UnifiedImages";
-import { useAuthStore } from "@/src/context/authContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LoginResponse } from "@/src/interfaces/LoginResponse";
 
 interface Props {
   unifiedImages: UnifiedImage[]
@@ -25,7 +26,6 @@ export default function AddPhotoScreen({unifiedImages}: Props) {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const {id} = useAuthStore()
 
   useEffect(() => {
     loadAlbums();
@@ -60,13 +60,15 @@ export default function AddPhotoScreen({unifiedImages}: Props) {
     }
 
     try {
+      const loginResponse: LoginResponse = JSON.parse(await AsyncStorage.getItem('authData') ?? '')
+      
       for (const image of images) {
         const formData = new FormData();
 
         formData.append('image', image.blob)
         formData.append('description', description);
         formData.append('album', selectedAlbum.id);
-        formData.append('author', id!)
+        formData.append('author', loginResponse.id)
 
         await api.post<Publish>('/api/publish', formData, {
           headers: {
