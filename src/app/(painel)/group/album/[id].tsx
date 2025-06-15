@@ -1,45 +1,57 @@
 import Stack from "@/src/components/stack";
-import { FontAwesome6 } from "@expo/vector-icons";
-import { FlatList, Image, Pressable, Text, View } from "react-native";
-
-const DATA = [
-  {
-    id: "1",
-    perfil: "https://reactnative.dev/img/tiny_logo.png",
-    name: "Vinícius Fazolo",
-    date: "12/04/2025 12:25",
-    description:
-      "simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled",
-    image:
-      "https://149616941.v2.pressablecdn.com/wp-content/uploads/2021/04/SRV-working-with-older-people-thumbnail.jpg",
-  },
-  {
-    id: "2",
-    perfil: "https://reactnative.dev/img/tiny_logo.png",
-    name: "Nelson Fazolo",
-    date: "13/04/2025 15:25",
-    description:
-      "simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled",
-    image:
-      "https://149616941.v2.pressablecdn.com/wp-content/uploads/2021/04/SRV-working-with-older-people-thumbnail.jpg",
-  },
-];
+import { Publish } from "@/src/interfaces/Publish";
+import api, { API_BASE_URL } from "@/src/services/api";
+import { FontAwesome6, Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import { Alert, FlatList, Image, Pressable, Text, View } from "react-native";
 
 export default function Album() {
-  function renderItem({ item }: any) {
+  const {id} = useLocalSearchParams()
+  const [publishs, setPublishs] = useState<Publish[]>([])
+
+  useEffect(() => {
+    findPublishs()
+  }, [])
+
+  const findPublishs = useCallback(async () => {
+    try {
+      const response = await api.get<Publish[]>(`${API_BASE_URL}/api/publish/${id}`);
+      const formatter = new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+
+      const obj = response.data.map(item => ({
+        ...item,
+        whenSent: formatter.format(new Date(item.whenSent)),
+      }));
+      
+      console.log(obj)
+      setPublishs(obj)
+    } catch {
+      Alert.alert("Erro ao carregar as fotos")
+    }
+  }, [])
+
+  function renderItem({ item }: { item: Publish }) {
     return (
       <View className="flex flex-col gap-4 mb-8">
         <View className="flex flex-row gap-4 items-center w-full justify-start">
           <Image
             className="rounded-full w-12 h-12"
-            source={{ uri: `${item.perfil}` }}
+            source={{ uri: `${item.author.image}` }}
           />
 
           <View>
             <Text className="font-medium text-base text-gray-900">
-              {item.name}
+              {item.author.name}
             </Text>
-            <Text className="text-xs text-gray-900">{item.date}</Text>
+            <Text className="text-xs text-gray-900">{item.whenSent}</Text>
           </View>
         </View>
 
@@ -74,17 +86,26 @@ export default function Album() {
       </Stack>
 
       <View className="flex-1 px-4">
-        <FlatList
-          data={DATA}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          ListHeaderComponent={
-            <Text className="mt-4 mb-4 text-gray-600 text-xs">Total de 2 fotos</Text>
-          }
-          ListFooterComponent={
-            <Text className="mb-4 text-center text-gray-600 text-xs">Sem mais resultados</Text>
-          }
-        />
+        {publishs.length > 0 ? (
+          <FlatList
+            data={publishs}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            ListHeaderComponent={
+              <Text className="mt-4 mb-4 text-gray-600 text-xs">Total de {publishs.length} fotos</Text>
+            }
+            ListFooterComponent={
+              <Text className="mb-4 text-center text-gray-600 text-xs">Sem mais resultados</Text>
+            }
+          />)
+          :
+          (
+            <View className="items-center justify-center h-full">
+              <Ionicons name="images-outline" size={100} color="#4b5563" />
+              <Text className="text-gray-600">Álbum vazio</Text>
+            </View>
+          )
+        }
       </View>
     </View>
   );

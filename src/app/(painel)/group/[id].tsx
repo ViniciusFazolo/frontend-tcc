@@ -51,7 +51,7 @@ export default function GroupScreen() {
   }
 
    function navigateToAlbum(id: string){
-    route.navigate('./album/[id]')
+    route.navigate(`./album/${id}`)
    }
 
    function openMenu() {

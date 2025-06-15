@@ -1,25 +1,25 @@
 import { useRouter } from "expo-router";
 import { Image, Pressable, Text, TextInput, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "@/src/services/api";
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import Stack from "@/src/components/stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Asset } from "expo-asset";
 import { Album } from "@/src/interfaces/Album";
-import { useGroupStore } from "@/src/context/groupContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function AddAlbumScreen() {
   const route = useRouter();
   const insets = useSafeAreaInsets();
-  const { currentGroupId } = useGroupStore();
+  const [groupId, setGroupId] = useState<string>('')
 
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [albumName, setAlbumName] = useState<string>("");
 
   function handleBackPage() {
-    route.replace(`/(painel)/group/${currentGroupId}`);
+    route.replace(`/(painel)/group/${groupId}`);
   }
 
   async function pickImage() {
@@ -41,7 +41,7 @@ export default function AddAlbumScreen() {
     }
 
 
-    if (!currentGroupId) {
+    if (!groupId) {
       alert("ID do grupo não encontrado");
       return;
     }
@@ -63,7 +63,7 @@ export default function AddAlbumScreen() {
       }
 
       obj.append("name", albumName);
-      obj.append("group", String(currentGroupId)); // vínculo com o grupo
+      obj.append("group", String(groupId)); // vínculo com o grupo
 
       const res = await api.post<Album>(`/api/album`, obj, {
         headers: {
@@ -71,7 +71,7 @@ export default function AddAlbumScreen() {
         },
       });
 
-      route.replace(`/(painel)/group/${currentGroupId}`);
+      route.replace(`/(painel)/group/${groupId}`);
 
     } catch (error: any) {
       console.error("Erro ao criar álbum:", error);
@@ -79,9 +79,18 @@ export default function AddAlbumScreen() {
     }
   }
 
+  useEffect(() => {
+    const fetchGroupId = async () => {
+      const res = await AsyncStorage.getItem('groupId');
+      setGroupId(res ?? '');
+    };
+
+    fetchGroupId();
+  }, []);
+
   return (
     <View style={{ marginTop: insets.top, marginBottom: insets.bottom }} className="flex-1">
-      <Stack href={`/(painel)/group/${currentGroupId}`}>
+      <Stack href={`/(painel)/group/${groupId}`}>
         <Pressable onPress={handleBackPage}>
           <Text className="text-gray-900">Voltar</Text>
         </Pressable>
