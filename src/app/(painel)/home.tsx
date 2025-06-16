@@ -1,8 +1,10 @@
 import Dropdown from "@/src/components/dropdown";
 import { useAuthStore } from "@/src/context/authContext";
 import { Group } from "@/src/interfaces/Group";
-import { API_BASE_URL, findAll } from "@/src/services/api";
+import { LoginResponse } from "@/src/interfaces/LoginResponse";
+import api, { API_BASE_URL, findAll } from "@/src/services/api";
 import { AntDesign, Feather, FontAwesome6 } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
@@ -82,10 +84,16 @@ export default function Home() {
 
   useFocusEffect(
     useCallback(() => {
-      findAll<Group>(`${API_BASE_URL}/api/group`)
-        .then(res => setGroups(res));
+      getGroups()
     }, [])
   );
+
+  async function getGroups() {
+    const loginResponse: LoginResponse = JSON.parse(await AsyncStorage.getItem('authData') ?? '')
+    
+    api.get<Group[]>(`${API_BASE_URL}/api/group/userId/${loginResponse.id}`)
+      .then(res => setGroups(res.data));
+  }
 
   return (
     <SafeAreaView className="flex gap-4 flex-1 bg-[#F6F6F6] relative">
