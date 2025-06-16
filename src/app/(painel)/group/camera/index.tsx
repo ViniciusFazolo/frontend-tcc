@@ -103,6 +103,7 @@ export default function Camera() {
 
   function cancelPicture() {
     setImages([]);
+    handleSetCurrentStep("camera")
   }
 
   function deleteImage(index: number) {
