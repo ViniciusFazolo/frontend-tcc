@@ -30,6 +30,7 @@ export default function Camera() {
   const [uri, setUri] = useState<string>("");
   const [images, setImages] = useState<UnifiedImage[]>([]);
   const [currentStep, setCurrentStep] = useState<CurrentStep>("camera") 
+  const [isSelectingMoreImages, setIsSelectingMoreImages] = useState(false)
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -64,12 +65,16 @@ export default function Camera() {
       const blob = await respnse.blob()
       const unifiedImage: UnifiedImage = {
         uri: photo?.uri,
-        blob: blob
+        blob: blob,
+        type: "image/" + photo.format
       }
 
       setImages((curr) => [...curr, unifiedImage]);
       setUri(photo?.uri!);
-      handleSetCurrentStep("preview")
+      if(!isSelectingMoreImages){
+        handleSetCurrentStep("preview")
+      }
+      console.log(photo)
       return
     }
 
@@ -88,13 +93,17 @@ export default function Camera() {
       result.assets?.forEach((item) => {
         const unifiedImage: UnifiedImage = {
           uri: item.uri,
-          blob: item.file!
+          blob: item.file!,
+          type: item.mimeType ?? ''
         }
         setImages((curr) => [...curr, unifiedImage]);
       });
 
+      console.log(result)
       setUri(result.assets[0].uri);
-      handleSetCurrentStep("preview")
+      if(!isSelectingMoreImages){
+        handleSetCurrentStep("preview")
+      }
       return
     }
 
@@ -103,6 +112,12 @@ export default function Camera() {
 
   function cancelPicture() {
     setImages([]);
+    setIsSelectingMoreImages(false)
+    handleSetCurrentStep("camera")
+  }
+
+  function selectMoreImages() {
+    setIsSelectingMoreImages(true)
     handleSetCurrentStep("camera")
   }
 
@@ -122,6 +137,45 @@ export default function Camera() {
             arrowColor="white"
           />
         </View>
+
+        {(images.length > 0 && isSelectingMoreImages) && (
+          <View className="h-16 px-2 items-center mb-7">
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ alignItems: "center", gap: 3 }}
+            >
+              {images.map((image, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => setUri(image.uri)}
+                  className={`h-16 w-16 rounded-md overflow-hidden`}
+                >
+                  <Image source={{ uri: image.uri }} className="w-full h-full" />
+
+                  {image.uri === uri && (
+                    <Pressable
+                      onPress={() => deleteImage(index)}
+                      className="w-16 h-16 absolute bg-black/40 items-center justify-center"
+                    >
+                      <Ionicons name="trash-outline" size={24} color="white" />
+                    </Pressable>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        {isSelectingMoreImages && (
+          <Pressable 
+              onPress={() => handleSetCurrentStep("preview")}
+              className="absolute bottom-[12.5rem] right-5 items-center justify-center w-16 h-16 bg-green-900 rounded-full"
+            >
+              <Ionicons name="arrow-forward" size={35} color="white" />
+          </Pressable>
+        )}
+
         <View
           className="w-full flex-row items-center justify-around"
           style={{ marginBottom: insets.bottom + 40 }}
@@ -205,7 +259,7 @@ export default function Camera() {
 
         <View className="flex-row justify-end gap-3 w-full px-5 items-center mb-5">
           <TouchableOpacity
-            onPress={cancelPicture}
+            onPress={selectMoreImages}
             className="items-center justify-center w-16 h-16 bg-black/40 rounded-full"
           >
             <MaterialCommunityIcons

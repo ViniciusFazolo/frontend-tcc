@@ -4,13 +4,14 @@ import api, { API_BASE_URL } from "@/src/services/api";
 import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Alert, FlatList, Image, Pressable, Text, View } from "react-native";
+import { Alert, Dimensions, FlatList, Image, Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Album() {
   const {id} = useLocalSearchParams()
   const insets = useSafeAreaInsets()
   const [publishs, setPublishs] = useState<Publish[]>([])
+  const screenWidth = Dimensions.get("window").width;
 
   useEffect(() => {
     findPublishs()
@@ -19,6 +20,7 @@ export default function Album() {
   const findPublishs = useCallback(async () => {
     try {
       const response = await api.get<Publish[]>(`${API_BASE_URL}/api/publish/${id}`);
+      console.log(response)
       const formatter = new Intl.DateTimeFormat('pt-BR', {
         day: '2-digit',
         month: '2-digit',
@@ -58,14 +60,29 @@ export default function Album() {
 
         <Text className="text-gray-900">{item.description}</Text>
 
-        <Pressable className="w-full h-72">
-          <Image
-            className="w-full h-full rounded-2xl mb-1"
-            source={{
-              uri: `${item.image}`,
-            }}
-          />
-        </Pressable>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          pagingEnabled
+          contentContainerStyle={{ alignItems: "center", gap: 3 }}
+        >
+          {item.images.map((img, index) => (
+              <Pressable key={index} className="w-full h-72">
+                <Image
+                  style={{
+                    width: screenWidth,
+                    height: 300, // altura ajustável
+                    borderRadius: 16,
+                    resizeMode: 'contain',
+                  }}
+                  source={{
+                    uri: `${img}`,
+                  }}
+                />
+              </Pressable>
+          ))}
+        </ScrollView>
       </View>
     );
   }

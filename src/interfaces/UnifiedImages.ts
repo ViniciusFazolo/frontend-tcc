@@ -1,4 +1,5 @@
 export interface UnifiedImage {
   uri: string;
-  blob: Blob
+  blob: Blob;
+  type: string;
 }

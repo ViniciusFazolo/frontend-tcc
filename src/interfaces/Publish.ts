@@ -7,7 +7,7 @@ export interface Publish {
   id: string;
   description: string;
   whenSent: string; 
-  image: string;
+  images: string[];
   author: User;
   commentaries: Commentary[];
   album: Album;

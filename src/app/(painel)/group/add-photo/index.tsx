@@ -10,6 +10,7 @@ import { Publish } from "@/src/interfaces/Publish";
 import { UnifiedImage } from "@/src/interfaces/UnifiedImages";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LoginResponse } from "@/src/interfaces/LoginResponse";
+import { MultipartImageFormat } from "@/src/interfaces/MultipartImageFormat";
 
 interface Props {
   unifiedImages: UnifiedImage[]
@@ -61,29 +62,30 @@ export default function AddPhotoScreen({unifiedImages}: Props) {
 
     try {
       const loginResponse: LoginResponse = JSON.parse(await AsyncStorage.getItem('authData') ?? '')
+      const formData = new FormData();
       
-      for (const image of images) {
-        const formData = new FormData();
-
-        if (Platform.OS === 'web') {
-          formData.append('image', image.blob);
-        } else {
+      if (Platform.OS === 'web') {
+        for (const image of images) {
+          formData.append('images', image.blob, `photo_${Date.now()}.` + image.type.split('/')[1],);
+        }
+      } else {
+        for (const image of images) {
           formData.append('image', {
             uri: image.uri,
-            type: 'image/jpeg',
-            name: `photo_${Date.now()}.jpg`,
+            type: image.type,
+            name: `photo_${Date.now()}.` + image.type.split('/')[1],
           } as any);
         }
-        formData.append('description', description);
-        formData.append('album', selectedAlbum.id);
-        formData.append('author', loginResponse.id)
-
-        await api.post<Publish>('/api/publish', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
       }
+      formData.append('description', description);
+      formData.append('album', selectedAlbum.id);
+      formData.append('author', loginResponse.id)
+
+      await api.post<Publish>('/api/publish', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
       Alert.alert('Sucesso', 'Fotos salvas com sucesso!', [
         {
@@ -144,7 +146,7 @@ export default function AddPhotoScreen({unifiedImages}: Props) {
                 <Image
                   source={{ uri: images[currentImageIndex].uri }}
                   className="w-full h-full"
-                  resizeMode="cover"
+                  resizeMode="contain"
                 />
               </View>
               
