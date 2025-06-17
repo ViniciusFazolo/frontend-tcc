@@ -20,7 +20,6 @@ export default function Album() {
   const findPublishs = useCallback(async () => {
     try {
       const response = await api.get<Publish[]>(`${API_BASE_URL}/api/publish/${id}`);
-      console.log(response)
       const formatter = new Intl.DateTimeFormat('pt-BR', {
         day: '2-digit',
         month: '2-digit',
@@ -64,23 +63,20 @@ export default function Album() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          pagingEnabled
-          contentContainerStyle={{ alignItems: "center", gap: 3 }}
+          contentContainerStyle={{ alignItems: "center", gap: 8, paddingHorizontal: 4 }}
         >
           {item.images.map((img, index) => (
-              <Pressable key={index} className="w-full h-72">
-                <Image
-                  style={{
-                    width: screenWidth,
-                    height: 300, // altura ajustável
-                    borderRadius: 16,
-                    resizeMode: 'contain',
-                  }}
-                  source={{
-                    uri: `${img}`,
-                  }}
-                />
-              </Pressable>
+            <Pressable key={index}>
+              <Image
+                style={{
+                  width: screenWidth * 0.9, // 90% da largura da tela
+                  height: 300,
+                  borderRadius: 16,
+                  resizeMode: 'cover', // ou 'contain'
+                }}
+                source={{ uri: `${img}` }}
+              />
+            </Pressable>
           ))}
         </ScrollView>
       </View>

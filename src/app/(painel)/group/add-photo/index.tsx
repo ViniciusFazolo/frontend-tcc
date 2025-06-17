@@ -70,7 +70,7 @@ export default function AddPhotoScreen({unifiedImages}: Props) {
         }
       } else {
         for (const image of images) {
-          formData.append('image', {
+          formData.append('images', {
             uri: image.uri,
             type: image.type,
             name: `photo_${Date.now()}.` + image.type.split('/')[1],
