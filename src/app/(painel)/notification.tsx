@@ -1,6 +1,6 @@
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Notification() {
@@ -34,7 +34,10 @@ export default function Notification() {
         </View>
 
         <View className="flex flex-row items-start gap-4">
-          <View className="w-8 h-8 bg-gray-600 rounded-full"></View>
+          <Image
+              className="rounded-full w-10 h-10"
+              source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }}
+            />
           <View className="flex flex-col flex-1 gap-2">
             <Text className="text-gray-900">
               <Text className="text-gray-900 font-semibold">
@@ -44,15 +47,15 @@ export default function Notification() {
             </Text>
 
             <View className="flex flex-row gap-1">
-              <Pressable>
-                <Text className="flex items-center gap-1 w-max px-3 py-1 text-xs bg-green-200 text-green-600 rounded-lg">
-                  <AntDesign name="check" size={35} />
+              <Pressable className="w-max bg-green-200 rounded-lg flex-row items-center px-3 py-2">
+                <AntDesign name="check" size={24} color='#14532d'/>
+                <Text className="text-green-900">
                   Aceitar
                 </Text>
               </Pressable>
-              <Pressable>
-                <Text className="flex items-center gap-1 w-max px-3 py-1 text-xs bg-gray-200 text-gray-600 rounded-lg">
-                  <MaterialIcons name="close" size={24} color="black" />
+              <Pressable className="bg-gray-200 rounded-lg flex-row items-center px-3 py-2">
+                <MaterialIcons name="close" size={24} color="#4b5563" />
+                <Text className="text-gray-600 ">
                   Recusar
                 </Text>
               </Pressable>
