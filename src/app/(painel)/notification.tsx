@@ -1,16 +1,18 @@
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Notification() {
   const route = useRouter();
+  const insets = useSafeAreaInsets()
 
   function handleBackPage() {
     route.replace("/(painel)/home");
   }
 
   return (
-    <>
+    <View style={{marginTop: insets.top}}>
       <View className="bg-white w-full h-[70px] flex flex-row items-center gap-4 py-5 px-3 text-gray-900 border-b shadow-[0_0_10px_rgba(0,0,0,0.05)] border-b-gray-200">
         <Pressable
           onPress={handleBackPage}
@@ -58,6 +60,6 @@ export default function Notification() {
           </View>
         </View>
       </View>
-    </>
+    </View>
   );
 }
