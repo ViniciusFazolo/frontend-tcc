@@ -14,6 +14,10 @@ export default function Participants() {
     route.replace("/(painel)/home");
   }
 
+  function navigateToAddParticipant() {
+    route.replace("./add-participant")
+  }
+
   useLayoutEffect(() => {
     navigation.setOptions({
       tabBarStyle: { display: "none" },
@@ -26,7 +30,7 @@ export default function Participants() {
         <Pressable onPress={handleBackPage} className="flex-1">
           <Text className="text-gray-900">Voltar</Text>
         </Pressable>
-        <Pressable className="p-3">
+        <Pressable className="p-3" onPress={navigateToAddParticipant}>
             <AntDesign name="adduser" size={24} className="text-gray-600"/>
         </Pressable>
       </Stack>
