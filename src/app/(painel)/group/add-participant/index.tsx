@@ -1,16 +1,18 @@
 import Stack from "@/src/components/stack";
 import { useRouter } from "expo-router";
 import { Image, Pressable, Text, TextInput, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AddParticipant() {
   const route = useRouter();
+  const insets = useSafeAreaInsets()
 
   function handleBackPage() {
     route.replace("/(painel)/home");
   }
 
   return (
-    <>
+    <View style={{marginTop: insets.top}}>
       <Stack href={"/(painel)/home"}>
         <Pressable onPress={handleBackPage}>
           <Text className="text-gray-900">Voltar</Text>
@@ -59,6 +61,6 @@ export default function AddParticipant() {
           </View>
         </View>
       </View>
-    </>
+    </View>
   );
 }
