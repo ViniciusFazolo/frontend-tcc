@@ -1,15 +1,23 @@
 import Stack from "@/src/components/stack";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
+import { useLayoutEffect } from "react";
 import { Image, Pressable, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AddParticipant() {
   const route = useRouter();
   const insets = useSafeAreaInsets()
+  const navigation = useNavigation();
 
   function handleBackPage() {
     route.replace("/(painel)/home");
   }
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      tabBarStyle: { display: "none" },
+    });
+  }, [navigation]);
 
   return (
     <View style={{marginTop: insets.top}}>
