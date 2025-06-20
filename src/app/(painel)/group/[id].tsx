@@ -139,8 +139,8 @@ export default function GroupScreen() {
             )}
           </View>
         </View>
-        <Pressable onPress={openMenu} className="p-3">
-          <FontAwesome6 name="ellipsis-vertical" size={20} color="#374151" />
+        <Pressable onPress={openMenu} className="p-5">
+          <FontAwesome6 name="ellipsis-vertical" size={24} color="#374151" />
         </Pressable>
       </Stack>
 
