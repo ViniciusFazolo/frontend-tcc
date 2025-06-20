@@ -109,10 +109,10 @@ export default function GroupScreen() {
   return (
     <View style={{marginTop: insets.top}} className="flex-1 bg-white">
       <Dropdown open={isMenuOpen} closeOnPress={openMenu} closeOnTouchMove={() => setIsMenuOpen(false)}>
-        <Pressable onPress={navigateToAddParticipant} className="p-4 border-b border-gray-100">
+        <Pressable onPress={navigateToAddParticipant} className="p-4">
           <Text className="text-gray-900">Adicionar membro</Text>
         </Pressable>
-        <Pressable onPress={navigateToParticipants} className="p-4 border-b border-gray-100">
+        <Pressable onPress={navigateToParticipants} className="p-4">
           <Text className="text-gray-900">Ver membros</Text>
         </Pressable>
         <Pressable onPress={loadGroupData} className="p-4">
