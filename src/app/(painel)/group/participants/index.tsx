@@ -22,33 +22,18 @@ export default function Participants() {
       </Stack>
 
       <View className="mt-8 flex flex-col gap-2 px-5">
-        <Text className="font-semibold text-gray-900">Participantes: 3</Text>
+        <Text className="font-semibold text-gray-900 mb-2">Participantes: 3</Text>
         <View className="flex flex-col gap-2">
           <View className="flex flex-row items-center gap-4">
-            <View className="w-8 h-8 bg-gray-600 rounded-full"></View>
-            <Text className="text-sm text-gray-900">
-              teste@gmail.com
-            </Text>
-          </View>
-          <View className="flex flex-row items-center gap-4">
             <Image
-              className="rounded-full w-8 h-8"
+              className="rounded-full w-10 h-10"
               source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }}
             />
-            <Text className="flex-1 text-sm text-gray-900">
+            <Text className="text-gray-900 font-semibold">
               Vinícius Fazolo (Você)
             </Text>
-            <Text className="px-3 py-1 text-xs bg-green-200 text-green-600 rounded-3xl">
+            <Text className="px-3 py-1 text-sm bg-green-200 text-green-600 rounded-3xl">
               Admin
-            </Text>
-          </View>
-          <View className="flex flex-row items-center gap-4">
-            <Image
-              className="rounded-full w-8 h-8"
-              source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }}
-            />
-            <Text className="text-sm text-gray-900">
-              nelsonfrjunior@gmail.com
             </Text>
           </View>
         </View>
