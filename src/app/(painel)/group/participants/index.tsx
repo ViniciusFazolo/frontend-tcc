@@ -2,16 +2,18 @@ import Stack from "@/src/components/stack";
 import { AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Image, Pressable, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Participants() {
   const route = useRouter();
+  const insets = useSafeAreaInsets()
 
   function handleBackPage() {
     route.replace("/(painel)/home");
   }
 
   return (
-    <>
+    <View style={{marginTop: insets.top}}>
       <Stack href={"/(painel)/home"}>
         <Pressable onPress={handleBackPage} className="flex-1">
           <Text className="text-gray-900">Voltar</Text>
@@ -38,6 +40,6 @@ export default function Participants() {
           </View>
         </View>
       </View>
-    </>
+    </View>
   );
 }
