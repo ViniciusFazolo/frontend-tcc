@@ -1,8 +1,8 @@
 import Stack from "@/src/components/stack";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { CameraView, CameraType, useCameraPermissions, CameraCapturedPicture } from "expo-camera";
-import { router, useNavigation } from "expo-router";
-import { useLayoutEffect, useRef, useState } from "react";
+import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
+import { useNavigation } from "expo-router";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   Button,
   Image,
@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import AddPhotoScreen from "../add-photo";
 import { UnifiedImage } from "@/src/interfaces/UnifiedImages";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type CurrentStep = "camera" | "preview" | "details" 
 
@@ -31,12 +32,22 @@ export default function Camera() {
   const [images, setImages] = useState<UnifiedImage[]>([]);
   const [currentStep, setCurrentStep] = useState<CurrentStep>("camera") 
   const [isSelectingMoreImages, setIsSelectingMoreImages] = useState(false)
+  const [groupId, setGroupId] = useState<string>();
 
   useLayoutEffect(() => {
     navigation.setOptions({
       tabBarStyle: { display: "none" },
     });
   }, [navigation]);
+
+  useEffect(() => {
+    const fetchGroupId = async () => {
+      const res = await AsyncStorage.getItem('groupId');
+      setGroupId(res ?? '');
+    };
+
+    fetchGroupId();
+  })
 
   if (!permission) {
     return <View />;
@@ -132,7 +143,7 @@ export default function Camera() {
       <CameraView ref={ref} mirror={true} style={styles.camera} facing={facing}>
         <View className="absolute top-0" style={{ marginTop: insets.top }}>
           <Stack
-            href="/(painel)/home"
+            href={`/(painel)/group/${groupId}`}
             bgColor="bg-transparent"
             arrowColor="white"
           />

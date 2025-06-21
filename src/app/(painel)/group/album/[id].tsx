@@ -2,6 +2,7 @@ import Stack from "@/src/components/stack";
 import { Publish } from "@/src/interfaces/Publish";
 import api, { API_BASE_URL } from "@/src/services/api";
 import { FontAwesome6, Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, Dimensions, FlatList, Image, Pressable, ScrollView, Text, View } from "react-native";
@@ -12,9 +13,17 @@ export default function Album() {
   const insets = useSafeAreaInsets()
   const [publishs, setPublishs] = useState<Publish[]>([])
   const screenWidth = Dimensions.get("window").width;
+  const [groupId, setGroupId] = useState<string>();
 
   useEffect(() => {
     findPublishs()
+
+    const fetchGroupId = async () => {
+      const res = await AsyncStorage.getItem('groupId');
+      setGroupId(res ?? '');
+    };
+
+    fetchGroupId();
   }, [])
 
   const findPublishs = useCallback(async () => {
@@ -85,7 +94,7 @@ export default function Album() {
 
   return (
     <View style={{marginTop: insets.top}} className="flex flex-1 bg-[#F6F6F6]">
-      <Stack href={'/(painel)/home'}>
+      <Stack href={`/(painel)/group/${groupId}`}>
         <View className="flex-1 flex flex-row items-center gap-4">
           <Image
             className="rounded-full w-10 h-10"

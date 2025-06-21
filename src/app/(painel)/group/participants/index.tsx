@@ -15,9 +15,10 @@ export default function Participants() {
   const navigation = useNavigation()
   const [users, setUsers] = useState<User[]>([])
   const [group, setGroup] = useState<Group | null>(null);
+  const [groupId, setGroupId] = useState<string>();
 
   function handleBackPage() {
-    route.replace("/(painel)/home");
+    route.replace(`/(painel)/group/${groupId}`);
   }
 
   function navigateToAddParticipant() {
@@ -53,6 +54,13 @@ export default function Participants() {
   }
 
   useEffect(() => {
+    const fetchGroupId = async () => {
+      const res = await AsyncStorage.getItem('groupId');
+      setGroupId(res ?? '');
+    };
+
+    fetchGroupId();
+
     loadParticipants()
     loadGroup()
   }, [])
@@ -60,7 +68,7 @@ export default function Participants() {
 
   return (
     <View style={{marginTop: insets.top}}>
-      <Stack href={"/(painel)/home"}>
+      <Stack href={`/(painel)/group/${groupId}`}>
         <Pressable onPress={handleBackPage} className="flex-1">
           <Text className="text-gray-900">Voltar</Text>
         </Pressable>

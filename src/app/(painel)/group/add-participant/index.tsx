@@ -1,16 +1,18 @@
 import Stack from "@/src/components/stack";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRouter } from "expo-router";
-import { useLayoutEffect } from "react";
-import { Image, Pressable, Text, TextInput, View } from "react-native";
+import { useEffect, useLayoutEffect, useState } from "react";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AddParticipant() {
   const route = useRouter();
   const insets = useSafeAreaInsets()
   const navigation = useNavigation();
+  const [groupId, setGroupId] = useState<string>();
 
   function handleBackPage() {
-    route.replace("/(painel)/home");
+    route.replace(`/(painel)/group/${groupId}`);
   }
 
   useLayoutEffect(() => {
@@ -19,9 +21,18 @@ export default function AddParticipant() {
     });
   }, [navigation]);
 
+  useEffect(() => {
+    const fetchGroupId = async () => {
+      const res = await AsyncStorage.getItem('groupId');
+      setGroupId(res ?? '');
+    };
+
+    fetchGroupId();
+  }, []);
+
   return (
     <View style={{marginTop: insets.top}}>
-      <Stack href={"/(painel)/home"}>
+      <Stack href={`/(painel)/group/${groupId}`}>
         <Pressable onPress={handleBackPage}>
           <Text className="text-gray-900">Voltar</Text>
         </Pressable>
