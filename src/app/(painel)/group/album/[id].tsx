@@ -24,7 +24,7 @@ export default function Album() {
     };
 
     fetchGroupId();
-  }, [])
+  }, [id])
 
   const findPublishs = useCallback(async () => {
     try {
@@ -47,7 +47,7 @@ export default function Album() {
     } catch {
       Alert.alert("Erro ao carregar as fotos")
     }
-  }, [])
+  }, [id])
 
   function renderItem({ item }: { item: Publish }) {
     return (
