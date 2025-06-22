@@ -7,5 +7,5 @@ export interface Group {
     description: string,
     image: string,
     adm: User,
-    userGroups: UserGroup
+    userGroups: UserGroup[]
 }

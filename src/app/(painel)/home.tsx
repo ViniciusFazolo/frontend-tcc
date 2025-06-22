@@ -7,7 +7,7 @@ import { AntDesign, Feather, FontAwesome6 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   FlatList,
   Image,
@@ -29,11 +29,11 @@ export default function Home() {
     <Pressable onPress={() => {router.navigate(`/group/${item.id}`)}} className="h-[70px] shadow-[0_0_10px_rgba(0,0,0,0.03)] bg-white border border-gray-200 p-4 w-full flex flex-row items-center gap-3 rounded-3xl mb-2">
       <Image className="rounded-full w-12 h-12" source={{ uri: item.image }} />
       <Text className="text-base text-gray-900 flex-1">{item.name}</Text>
-      {item.userGroups.totalNotifies > 0 && (
+      {item.userGroups[0].totalNotifies > 0 && (
         <View className="flex flex-col items-center gap-1">
-          <Text className="text-gray-600 font-semibold text-xs">{item.userGroups.hourLastPublish.split(":").slice(0, 2).join(":")}</Text>
+          <Text className="text-gray-600 font-semibold text-xs">{item.userGroups[0].hourLastPublish.split(":").slice(0, 2).join(":")}</Text>
           <Text className="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-xs">
-            {item.userGroups.totalNotifies}
+            {item.userGroups[0].totalNotifies}
           </Text>
         </View>
       )}
