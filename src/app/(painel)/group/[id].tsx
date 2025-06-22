@@ -8,8 +8,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Group } from "@/src/interfaces/Group";
 import { Album } from "@/src/interfaces/Album";
-import api from "@/src/services/api";
+import api, { API_BASE_URL } from "@/src/services/api";
 import { useGroupStore } from "@/src/context/groupContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LoginResponse } from "@/src/interfaces/LoginResponse";
 
 export default function GroupScreen() {
    const route = useRouter()
@@ -25,6 +27,7 @@ export default function GroupScreen() {
     if (id && typeof id === 'string') {
       setCurrentGroupId(id); // salva no zustand
       loadGroupData();
+      resetNotifiesGroup();
     }
   }, [id]);
 
@@ -44,6 +47,20 @@ export default function GroupScreen() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function resetNotifiesGroup() {
+    const loginResponse: LoginResponse = JSON.parse(await AsyncStorage.getItem('authData') ?? '')
+    const groupId = await AsyncStorage.getItem("groupId") ?? ''
+
+    const params: Record<string, string> = {
+      groupId: groupId,
+      userId: loginResponse.id
+    }
+
+    await api.get(`${API_BASE_URL}/api/userGroup`, {
+      params: params
+    })
   }
 
    function navigateToAddAlbum() {
