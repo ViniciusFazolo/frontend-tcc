@@ -1,6 +1,7 @@
 import Dropdown from "@/src/components/dropdown";
 import { useAuthStore } from "@/src/context/authContext";
 import { Group } from "@/src/interfaces/Group";
+import { Invite } from "@/src/interfaces/Invite";
 import { LoginResponse } from "@/src/interfaces/LoginResponse";
 import api, { API_BASE_URL, findAll } from "@/src/services/api";
 import { AntDesign, Feather, FontAwesome6 } from "@expo/vector-icons";
@@ -22,8 +23,30 @@ export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [groups, setGroups] = useState<Group[]>([])
+  const [totalPendingInvites, setTotalPendingInvites] = useState(0);
   const router = useRouter();
   const auth = useAuthStore()
+
+  async function fetchTotalPendingInvites() {
+    try {
+      const authData = await AsyncStorage.getItem("authData");
+      const userId = authData ? JSON.parse(authData).id : "";
+
+      if (!userId) {
+        console.warn("User ID not found for fetching invites.");
+        return;
+      }
+
+      const response = await api.get<Invite[]>(
+        `${API_BASE_URL}/api/group/invite/pending`,
+        { headers: { userId } }
+      );
+      setTotalPendingInvites(response.data.length);
+    } catch (error) {
+      console.error("Erro ao buscar total de convites pendentes:", error);
+      setTotalPendingInvites(0);
+    }
+  }
 
   const renderItem = ({ item }: { item: Group }) => (
     <Pressable onPress={() => {router.navigate(`/group/${item.id}`)}} className="h-[70px] shadow-[0_0_10px_rgba(0,0,0,0.03)] bg-white border border-gray-200 p-4 w-full flex flex-row items-center gap-3 rounded-3xl mb-2">
@@ -86,7 +109,8 @@ export default function Home() {
 
   useFocusEffect(
     useCallback(() => {
-      getGroups()
+      getGroups();
+      fetchTotalPendingInvites();
     }, [])
   );
 
@@ -110,8 +134,13 @@ export default function Home() {
       <View className="w-full h-[70px] flex flex-row items-center justify-between pl-5">
         <Text className="text-xl">Nome do app</Text>
         <View className="flex flex-row justify-center items-center text-gray-900">
-          <Pressable onPress={navigateToNotifications} className="p-5">
+          <Pressable onPress={navigateToNotifications} className="p-5 relative">
             <Feather name="bell" size={24} color="black" />
+            {totalPendingInvites > 0 && (
+              <View className="absolute top-3 right-3 bg-red-500 rounded-full w-5 h-5 flex items-center justify-center">
+                <Text className="text-white text-xs font-bold">{totalPendingInvites}</Text>
+              </View>
+            )}
           </Pressable>
           <Pressable onPress={openMenu} className="p-5">
             <FontAwesome6 name="ellipsis-vertical" size={24} color="black" />
